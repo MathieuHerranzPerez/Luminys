@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CircleCollider2D))]
 public class LightControler : MonoBehaviour
@@ -9,7 +10,7 @@ public class LightControler : MonoBehaviour
 
     public GameObject deathEffect;
 
-    //public Slider sliderSensitivity;  
+    public Slider sliderMultiplier;  
 
 
     private bool isMoving = false;
@@ -28,7 +29,7 @@ public class LightControler : MonoBehaviour
     private void Awake()
     {
         multiplier = PlayerPrefs.GetFloat("multiplier", multiplier);
-        //sliderMultiplier.value = multiplier;
+        sliderMultiplier.value = multiplier * 2f;
     }
 
     // Start is called before the first frame update
@@ -115,14 +116,25 @@ public class LightControler : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        Debug.Log("collision"); // affD
 
         if (col.tag == "MovingBlock")   // we get hit by a block
         {
-            Debug.Log("collision with movingBlock"); // affD
-            GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
-            Destroy(effect, 1f);
+            Die();
         }
+    }
+
+    private void Die()
+    {
+        GameObject effect = Instantiate(deathEffect, transform.position, Quaternion.identity);
+        Destroy(effect, 1f);
+        Destroy(gameObject);
+        GameManager.GetInstance().SetGameOver(true);
+    }
+
+    public void SetSensitivity()
+    {
+        multiplier = sliderMultiplier.value / 2f;
+        PlayerPrefs.SetFloat("multiplier", multiplier);                 // set in the preferences
     }
 }
 
